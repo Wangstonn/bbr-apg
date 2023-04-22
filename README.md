@@ -1,6 +1,16 @@
 # 557 
 
+## Getting started
+download mininet wifi image here https://mininet-wifi.github.io/get-started/
+set up oracle VM with that image
+download dependencies such as linux headers for the kernel version (uname -r)
 
+clone repo
+make
+insmod (rmmod first if updating kernel module)
+set bbr557 as CCA
+run bash script to run experiment and plot results
+enjoy 
 
 ## Getting started
 
