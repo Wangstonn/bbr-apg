@@ -130,7 +130,7 @@ def _parse_mahimahi_log():
     # Piped to /dev/null because stdout is just the SVG generated.
     # We just want the throutput information, which is stderr.
     debug_print_verbose("Parsing Mahimahi logs...")
-    command = ("mm-throughput-graph 10 /tmp/mahimahi_log > /dev/null")
+    command = ("mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/test.png")
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
     output = output.split('\n')
