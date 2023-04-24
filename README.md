@@ -1,6 +1,17 @@
 # 557 
 
 ## Getting started
+-git clone https://github.com/jervisfm/rebbr.git bbr
+    cd bbr
+    cd mahimahi/
+    sudo apt-get install python-setuptools
+    curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+    python2 get-pip.py
+    sudo easy_install pip==20.3.4
+    pip list
+    pip install matplotlib
+    ./init_deps.sh
+
 - download mininet wifi image here https://mininet-wifi.github.io/get-started/
 - set up oracle VM with that image
 - download dependencies such as linux headers for the kernel version (uname -r)

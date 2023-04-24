@@ -483,9 +483,9 @@ static void bbr_advance_cycle_phase(struct sock *sk)
 	struct tcp_sock *tp = tcp_sk(sk);
 	struct bbr *bbr = inet_csk_ca(sk);
 
-	bbr->cycle_idx = (bbr->cycle_idx + 1) & (CYCLE_LEN - 1);
+	bbr->cycle_idx = (bbr->cycle_idx + 1) & (CYCLE_LEN - 1); //Bitwise and->cycle idx between 0 and cycle_len
 	bbr->cycle_mstamp = tp->delivered_mstamp;
-	bbr->pacing_gain = bbr->lt_use_bw ? BBR_UNIT :
+	bbr->pacing_gain = bbr->lt_use_bw ? BBR_UNIT :			//input pacing gain
 					    bbr_pacing_gain[bbr->cycle_idx];
 }
 
