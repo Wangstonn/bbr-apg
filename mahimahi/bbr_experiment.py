@@ -126,11 +126,12 @@ def _parse_args():
     debug_print_verbose("Parse: " + str(Flags.parsed_args))
 
 
-def _parse_mahimahi_log():
+def _parse_mahimahi_log(cc):
     # Piped to /dev/null because stdout is just the SVG generated.
     # We just want the throutput information, which is stderr.
     debug_print_verbose("Parsing Mahimahi logs...")
-    command = ("mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/test.png")
+    command_text = "mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_output.svg" % cc
+    command = (command_text)
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
     output = output.split('\n')
@@ -261,7 +262,7 @@ def main():
     server_q.close()
 
     e.clear()
-    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log()
+    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc)
     debug_print("Experiment complete!")
 
     # Print the output
