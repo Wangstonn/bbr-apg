@@ -14,4 +14,4 @@ set -e # Stop if any error occurs.
 ./run_experiment4.sh $@
 
 # Plot the results.
-./bbr_plot.py
+#./bbr_plot.py
