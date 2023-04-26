@@ -121,7 +121,7 @@ struct bbr {
 };
 
 //#define CYCLE_LEN	8	/* number of phases in a pacing gain cycle */
-#define MAX_CYCLE_LEN 32
+#define MAX_CYCLE_LEN 31
 #define MIN_CYCLE_LEN 4
 #define BWRTT_TOL_B 1 //The larger this is the smaller the tolerance
 
@@ -361,14 +361,14 @@ static u32 bbr_target_cwnd(struct sock *sk, u32 bw, int gain)
 	if ((w > bbr->prev_w && w - bbr->prev_w > (bbr->prev_w >> BWRTT_TOL_B))||(w < bbr->prev_w  && bbr->prev_w - w > (bbr->prev_w >> BWRTT_TOL_B)))
 	{ //if change exceeds the tolerance decrease cycle length
 		u16 tmp = (bbr->cycle_len - 1);
-		//bbr->cycle_len = (tmp < MIN_CYCLE_LEN)? MIN_CYCLE_LEN : tmp;
-		bbr->cycle_len = 31;
+		bbr->cycle_len = (tmp < MIN_CYCLE_LEN)? MIN_CYCLE_LEN : tmp;
+		//bbr->cycle_len = 31;
 	}
 	else
 	{
 		u16 tmp = (bbr->cycle_len + 1);
-		//bbr->cycle_len = (tmp > MAX_CYCLE_LEN)? MAX_CYCLE_LEN : tmp;
-		bbr->cycle_len = 31;
+		bbr->cycle_len = (tmp >= MAX_CYCLE_LEN)? MAX_CYCLE_LEN : tmp;
+		//bbr->cycle_len = 31;
 	}
 
 	bbr->prev_w = w;
