@@ -10,8 +10,8 @@ set -e # Stop if any error occurs.
 #./run_figure8_experiment.sh $@
 ./557_run_experiment1.sh $@
 ./557_run_experiment2.sh $@
-#./run_experiment3.sh $@
-#./run_experiment4.sh $@
+./557_run_experiment3.sh $@
+./run_experiment4.sh $@
 
 # Plot the results.
 #./bbr_plot.py
