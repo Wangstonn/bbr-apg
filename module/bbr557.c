@@ -362,13 +362,13 @@ static u32 bbr_target_cwnd(struct sock *sk, u32 bw, int gain)
 	{ //if change exceeds the tolerance decrease cycle length
 		u16 tmp = (bbr->cycle_len - 1);
 		//bbr->cycle_len = (tmp < MIN_CYCLE_LEN)? MIN_CYCLE_LEN : tmp;
-		bbr->cycle_len = 8;
+		bbr->cycle_len = 32;
 	}
 	else
 	{
 		u16 tmp = (bbr->cycle_len + 1);
 		//bbr->cycle_len = (tmp > MAX_CYCLE_LEN)? MAX_CYCLE_LEN : tmp;
-		bbr->cycle_len = 8;
+		bbr->cycle_len = 32;
 	}
 
 	bbr->prev_w = w;
