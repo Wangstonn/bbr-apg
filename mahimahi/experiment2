@@ -1,0 +1,7 @@
+congestion_control, loss_rate, goodput_Mbps, rtt_ms, bandwidth_Mbps, specified_bw_Mbps
+bbr557, 0.001, 0.98, 100, 1.0, 100
+bbr557, 0.001, 0.98, 100, 1.0, 100
+bbr, 0.001, 0.98, 100, 1.0, 100
+bbr557, 0.001, 11.6, 100, 12.03, 100
+bbr557, 0.001, 0.02, 100, 0.02, 100
+bbr, 0.001, 0.02, 100, 0.02, 100
