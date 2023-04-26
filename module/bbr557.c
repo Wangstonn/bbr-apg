@@ -100,7 +100,7 @@ struct bbr {
 		tso_segs_goal:7,     /* segments we want in each skb we send */
 		idle_restart:1,	     /* restarting after idle? */
 		probe_rtt_round_done:1,  /* a BBR_PROBE_RTT round at 4 pkts? */
-		unused:5,
+		cycle_len:5,		//cycle length
 		lt_is_sampling:1,    /* taking long-term ("LT") samples now? */
 		lt_rtt_cnt:7,	     /* round trips in long-term interval */
 		lt_use_bw:1;	     /* use lt_bw as our bw estimate? */
@@ -112,17 +112,21 @@ struct bbr {
 		cwnd_gain:10,	/* current gain for setting cwnd */
 		full_bw_reached:1,   /* reached full bw in Startup? */
 		full_bw_cnt:2,	/* number of rounds without large bw gains */
-		cycle_idx:3,	/* current index in pacing_gain cycle array */
+		cycle_idx:5,	/* current index in pacing_gain cycle array */
 		has_seen_rtt:1, /* have we seen an RTT sample yet? */
-		unused_b:5;
+		unused_b:3;
+	u64	prev_w;			//Previous BWRTT
 	u32	prior_cwnd;	/* prior cwnd upon entering loss recovery */
 	u32	full_bw;	/* recent bw, to estimate if pipe is full */
 };
 
-#define CYCLE_LEN	8	/* number of phases in a pacing gain cycle */
+//#define CYCLE_LEN	8	/* number of phases in a pacing gain cycle */
+#define MAX_CYCLE_LEN 32
+#define MIN_CYCLE_LEN 4
+#define BWRTT_TOL_B = 2
 
 /* Window length of bw filter (in rounds): */
-static const int bbr_bw_rtts = CYCLE_LEN + 2;
+static const int bbr_bw_rtts = 8 + 2;
 /* Window length of min_rtt filter (in sec): */
 static const u32 bbr_min_rtt_win_sec = 10;
 /* Minimum time (in ms) spent at bbr_cwnd_min_target in BBR_PROBE_RTT mode: */
@@ -147,7 +151,15 @@ static const int bbr_pacing_gain[] = {
 	BBR_UNIT * 5 / 4,	/* probe for more available bw */
 	BBR_UNIT * 3 / 4,	/* drain queue and/or yield bw to other flows */
 	BBR_UNIT, BBR_UNIT, BBR_UNIT,	/* cruise at 1.0*bw to utilize pipe, */
-	BBR_UNIT, BBR_UNIT, BBR_UNIT	/* without creating excess queue... */
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,   /* without creating excess queue... */
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT
 };
 /* Randomize the starting gain cycling phase over N phases: */
 static const u32 bbr_cycle_rand = 7;
@@ -344,6 +356,24 @@ static u32 bbr_target_cwnd(struct sock *sk, u32 bw, int gain)
 
 	w = (u64)bw * bbr->min_rtt_us;
 
+	///// Winston ////
+
+	if ((w > bbr->prev_w && w - bbr->prev_w > bbr->prev_w >> BWRTT_TOL)||(w < bbr->prev_w  && bbr->prev_w - w > bbr->prev_w >> BWRTT_TOL))
+	{
+		u16 tmp = (bbr->cycle_len + 1);
+		bbr->cycle_len = (tmp > MAX_CYCLE_LEN) MAX_CYCLE_LEN : tmp;
+
+	}
+	else
+	{
+		u16 tmp = (bbr->cycle_len - 1);
+		bbr->cycle_len = (tmp < MIN_CYCLE_LEN) MIN_CYCLE_LEN : tmp;
+	}
+
+	bbr->prev_w = w;
+	//////////////////
+
+
 	/* Apply a gain to the given value, then remove the BW_SCALE shift. */
 	cwnd = (((w * gain) >> BBR_SCALE) + BW_UNIT - 1) / BW_UNIT;
 
@@ -483,7 +513,7 @@ static void bbr_advance_cycle_phase(struct sock *sk)
 	struct tcp_sock *tp = tcp_sk(sk);
 	struct bbr *bbr = inet_csk_ca(sk);
 
-	bbr->cycle_idx = (bbr->cycle_idx + 1) & (CYCLE_LEN - 1); //Bitwise and->cycle idx between 0 and cycle_len
+	bbr->cycle_idx = (bbr->cycle_idx + 1) & (bbr->cycle_len - 1); //Bitwise and->cycle idx between 0 and cycle_len
 	bbr->cycle_mstamp = tp->delivered_mstamp;
 	bbr->pacing_gain = bbr->lt_use_bw ? BBR_UNIT :			//input pacing gain
 					    bbr_pacing_gain[bbr->cycle_idx];
@@ -515,7 +545,9 @@ static void bbr_reset_probe_bw_mode(struct sock *sk)
 	bbr->mode = BBR_PROBE_BW;
 	bbr->pacing_gain = BBR_UNIT;
 	bbr->cwnd_gain = bbr_cwnd_gain;
-	bbr->cycle_idx = CYCLE_LEN - 1 - prandom_u32_max(bbr_cycle_rand);
+	bbr->prev_w = 0;
+	bbr->cycle_len = 8;
+	bbr->cycle_idx = bbr->cycle_len - 1 - prandom_u32_max(bbr_cycle_rand);
 	bbr_advance_cycle_phase(sk);	/* flip to next phase of gain cycle */
 }
 
@@ -672,7 +704,7 @@ static void bbr_update_bw(struct sock *sk, const struct rate_sample *rs)
 		bbr->packet_conservation = 0;
 	}
 
-	bbr_lt_bw_sampling(sk, rs);
+	bbr_lt_bw_sampling(sk, rs); //for policing
 
 	/* Divide delivered by the interval to find a (lower bound) bottleneck
 	 * bandwidth sample. Delivered is in packets and interval_us in uS and
@@ -862,6 +894,8 @@ static void bbr_init(struct sock *sk)
 	bbr->full_bw_cnt = 0;
 	bbr->cycle_mstamp = 0;
 	bbr->cycle_idx = 0;
+	bbr->cycle_len = 8;
+	bbr->prev_w = 0;
 	bbr_reset_lt_bw_sampling(sk);
 	bbr_reset_startup_mode(sk);
 
