@@ -9,22 +9,20 @@ mkdir -p data
 
 #LOSS_RATES="0.001 0.01 0.1 1 2 5 10 15 20 25 30 40 50"
 LOSS_RATES="0.1"
-BW_MBPS="1"
+#BW_MBPS="12"
 #CONGESTION_CONTROL="cubic bbr"
 CONGESTION_CONTROL="bbr557 bbr"
 #CONGESTION_CONTROL="gargbage"
-LOG_FILE=data/experiment1.csv
+LOG_FILE=data/experiment2.csv
 
 # Clear any existing data.
 rm -f $LOG_FILE
 
 # Run experiment.
-echo "Running Experiment 1: No Trace."
+echo "Running Experiment 2: Step Up."
 for cc in $CONGESTION_CONTROL; do
   for loss_rate in $LOSS_RATES; do
-    for bw in $BW_MBPS; do
-      echo "Executing trial with cc=$cc Loss rate: $loss_rate Bandwidth: $bw ..."
-      ./bbr_experiment.py --cc=$cc --loss=$loss_rate --bw=$bw --time 30 --output_file=$LOG_FILE $@ --experiment experiment1
-    done
+    echo "Executing trial with cc=$cc Loss rate: $loss_rate ..."
+    ./bbr_experiment.py --cc=$cc --loss=$loss_rate --traceup traces/up_step.up --tracedown traces/up_step.down --output_file=$LOG_FILE $@ --experiment experiment2
   done
 done

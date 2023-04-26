@@ -9,7 +9,7 @@ set -e # Stop if any error occurs.
 # Generate all the needed data.
 #./run_figure8_experiment.sh $@
 ./557_run_experiment1.sh $@
-#./run_experiment2.sh $@
+./557_run_experiment2.sh $@
 #./run_experiment3.sh $@
 #./run_experiment4.sh $@
 

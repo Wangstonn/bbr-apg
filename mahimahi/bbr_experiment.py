@@ -39,6 +39,7 @@ class Flags(object):
     TDOWN = "trace_downlink"
     HEADLESS = "headless"
     OUTPUT_FILE = "output_file"
+    EXPERIMENT = "output_file"
     parsed_args = None
 
 
@@ -101,6 +102,9 @@ def _parse_args():
     parser.add_argument('--output_file', dest=Flags.OUTPUT_FILE, type=str,
                         help="If non empty, will append measurement result to this file.",
                         default="")
+    parser.add_argument('--experiment', dest=Flags.EXPERIMENT, type=str,
+                        help="Name of experiment.",
+                        default="")
     parser.add_argument('--rtt', dest=Flags.RTT, type=int,
                         help="Specify the RTT of the link in milliseconds.",
                         default=100)
@@ -126,11 +130,11 @@ def _parse_args():
     debug_print_verbose("Parse: " + str(Flags.parsed_args))
 
 
-def _parse_mahimahi_log(cc):
+def _parse_mahimahi_log(cc, experiment):
     # Piped to /dev/null because stdout is just the SVG generated.
     # We just want the throutput information, which is stderr.
     debug_print_verbose("Parsing Mahimahi logs...")
-    command_text = "mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_output.svg" % cc
+    command_text = f"mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/{cc}_{experiment}_output.svg" 
     command = (command_text)
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
@@ -213,6 +217,7 @@ def main():
     bw = Flags.parsed_args[Flags.BW]
     cc = Flags.parsed_args[Flags.CC]
     output_file = Flags.parsed_args[Flags.OUTPUT_FILE]
+    experiment = Flags.parsed_args[Flags.EXPERIMENT] 
     uplink_trace = Flags.parsed_args[Flags.TUP]
     downlink_trace = Flags.parsed_args[Flags.TDOWN]
     # Generate the trace files based on the parameter
@@ -262,7 +267,7 @@ def main():
     server_q.close()
 
     e.clear()
-    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc)
+    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc,experiment)
     debug_print("Experiment complete!")
 
     # Print the output
