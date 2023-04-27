@@ -18,10 +18,10 @@ LOG_FILE=data/experiment4.csv
 rm -f $LOG_FILE
 
 # Run experiment.
-echo "Running Experiment 5: ATT LTE driving Trace."
+echo "Running Experiment 6: TMobile LTE driving Trace."
 for cc in $CONGESTION_CONTROL; do
   for loss_rate in $LOSS_RATES; do
     echo "Executing trial with cc=$cc Loss rate: $loss_rate ..."
-    ./bbr_experiment.py --cc=$cc --loss=$loss_rate --traceup traces/ATT-LTE-driving-2016.up --tracedown traces/ATT-LTE-driving-2016.down --output_file=$LOG_FILE $@ --experiment experiment5 
+    ./bbr_experiment.py --cc=$cc --loss=$loss_rate --traceup traces/TMobile-LTE-driving.up --tracedown traces/TMobile-LTE-driving.down --output_file=$LOG_FILE $@ --experiment experiment6 
   done
 done

@@ -9,9 +9,10 @@ set -e # Stop if any error occurs.
 # Generate all the needed data.
 #./run_figure8_experiment.sh $@
 ./557_run_experiment1.sh $@
-#./557_run_experiment2.sh $@
-#./557_run_experiment3.sh $@
+./557_run_experiment2.sh $@
+./557_run_experiment3.sh $@
 ./run_experiment4.sh $@
 ./557_run_experiment5.sh $@
+./557_run_experiment6.sh $@
 # Plot the results.
 #./bbr_plot.py
