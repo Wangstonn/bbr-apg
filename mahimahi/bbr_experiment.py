@@ -134,7 +134,7 @@ def _parse_mahimahi_log(cc, experiment):
     # Piped to /dev/null because stdout is just the SVG generated.
     # We just want the throutput information, which is stderr.
     debug_print_verbose("Parsing Mahimahi logs...")
-    command_text = "mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_%s_output.svg" %(cc,experiment)
+    command_text = "mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_%s_throughput.svg" %(cc,experiment)
     command = (command_text)
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
@@ -144,7 +144,19 @@ def _parse_mahimahi_log(cc, experiment):
     goodput = float(output[1].split(' ')[2])
     q_delay = float(output[2].split(' ')[5])
     s_delay = float(output[3].split(' ')[4])
-    return (capacity, goodput, q_delay, s_delay)
+
+    command_text = "mm-delay-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_%s_delay.svg" %(cc,experiment)
+    command = (command_text)
+    output = subprocess.check_output(
+        command, shell=True, stderr=subprocess.STDOUT)
+    #output = output.split('\n')
+    # debug_print_verbose(output)
+    # capacity = float(output[0].split(' ')[2])
+    # goodput = float(output[1].split(' ')[2])
+    # q_delay = float(output[2].split(' ')[5])
+    # s_delay = float(output[3].split(' ')[4])
+
+    return (capacity, goodput, q_delay, s_delay), output
 
 
 def _is_server_listening(port):
@@ -267,14 +279,14 @@ def main():
     server_q.close()
 
     e.clear()
-    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc,experiment)
+    (capacity, goodput, q_delay, s_delay),delay_output = _parse_mahimahi_log(cc,experiment)
     debug_print("Experiment complete!")
 
     # Print the output
     results = ', '.join([str(x)
                          for x in [cc, loss, goodput, rtt, capacity, bw]])
     stdout_print(results + "\n")
-
+    stdout_print(delay_output + "\n")
     # Also write to output file if it's set.
     if output_file:
         debug_print_verbose("Appending Result output to: %s" % output_file)
