@@ -121,7 +121,7 @@ struct bbr {
 };
 
 //#define CYCLE_LEN	8	/* number of phases in a pacing gain cycle */
-#define MAX_CYCLE_LEN 16 //max is 31
+#define MAX_CYCLE_LEN 31 //max is 31
 #define MIN_CYCLE_LEN 4
 #define BWRTT_TOL_B 3 //The larger this is the smaller the tolerance
 #define CYCLE_LEN_INCR 4 //Must be less than or equal to MINCUCLELEN
