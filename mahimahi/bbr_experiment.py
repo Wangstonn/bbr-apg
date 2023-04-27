@@ -145,7 +145,7 @@ def _parse_mahimahi_log(cc, experiment):
     q_delay = float(output[2].split(' ')[5])
     s_delay = float(output[3].split(' ')[4])
 
-    command_text = "mm-delay-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_%s_delay.svg" %(cc,experiment)
+    command_text = "mm-delay-graph 10 /tmp/mahimahi_log"
     command = (command_text)
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
