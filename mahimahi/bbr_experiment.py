@@ -283,7 +283,7 @@ def main():
     # Print the output
     results = ', '.join([str(x)
                          for x in [cc, loss, goodput, rtt, capacity, bw, q_delay, s_delay]])
-    stdout_print("Results:" + "\n")
+    stdout_print(results + "\n")
 
     # Also write to output file if it's set.
     if output_file:
