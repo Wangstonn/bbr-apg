@@ -7,7 +7,7 @@ set -e # Stop if any error occurs.
 ./initialize_congestion_control.sh
 
 # Generate all the needed data.
-./run_figure8_experiment.sh $@
+#./run_figure8_experiment.sh $@
 ./557_run_experiment1.sh $@
 ./557_run_experiment2.sh $@
 ./557_run_experiment3.sh $@
