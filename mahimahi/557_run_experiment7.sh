@@ -12,7 +12,7 @@ LOSS_RATES="0.1"
 #CONGESTION_CONTROL="cubic bbr"
 CONGESTION_CONTROL="bbr557 bbr"
 #CONGESTION_CONTROL="gargbage"
-LOG_FILE=data/experiment4.csv
+LOG_FILE=data/experiment7.csv
 
 # Clear any existing data.
 rm -f $LOG_FILE
