@@ -149,14 +149,12 @@ def _parse_mahimahi_log(cc, experiment):
     command = (command_text)
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
-    #output = output.split('\n')
-    # debug_print_verbose(output)
-    # capacity = float(output[0].split(' ')[2])
-    # goodput = float(output[1].split(' ')[2])
-    # q_delay = float(output[2].split(' ')[5])
-    # s_delay = float(output[3].split(' ')[4])
+    output = output.split('\n')
+    debug_print_verbose(output)
+    pkt_q_delay = float(output[0].split(' ')[5])
+    sig_delay = float(output[1].split(' ')[4])
 
-    return (capacity, goodput, q_delay, s_delay), output
+    return (capacity, goodput, q_delay, s_delay)
 
 
 def _is_server_listening(port):
@@ -279,14 +277,14 @@ def main():
     server_q.close()
 
     e.clear()
-    (capacity, goodput, q_delay, s_delay),delay_output = _parse_mahimahi_log(cc,experiment)
+    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc,experiment)
     debug_print("Experiment complete!")
 
     # Print the output
     results = ', '.join([str(x)
-                         for x in [cc, loss, goodput, rtt, capacity, bw]])
-    stdout_print(results + "\n")
-    stdout_print(delay_output + "\n")
+                         for x in [cc, loss, goodput, rtt, capacity, bw, q_delay, s_delay]])
+    stdout_print("Results:" + "\n")
+
     # Also write to output file if it's set.
     if output_file:
         debug_print_verbose("Appending Result output to: %s" % output_file)
@@ -295,7 +293,7 @@ def main():
                 output.write(results + "\n")
         else:
             with open(output_file, 'a') as output:
-                header_line = "congestion_control, loss_rate, goodput_Mbps, rtt_ms, bandwidth_Mbps, specified_bw_Mbps"
+                header_line = "congestion_control, loss_rate, goodput_Mbps, rtt_ms, bandwidth_Mbps, specified_bw_Mbps, pkt_q_delay, sig_delay"
                 output.write(header_line + "\n")
                 output.write(results + "\n")
 
