@@ -124,6 +124,7 @@ struct bbr {
 #define MAX_CYCLE_LEN 31
 #define MIN_CYCLE_LEN 4
 #define BWRTT_TOL_B 2 //The larger this is the smaller the tolerance
+#define CYCLE_LEN_INCR 4 //Must be less than or equal to MINCUCLELEN
 
 /* Window length of bw filter (in rounds): */
 static const int bbr_bw_rtts = 8 + 2;
@@ -360,13 +361,13 @@ static u32 bbr_target_cwnd(struct sock *sk, u32 bw, int gain)
 
 	if ((w > bbr->prev_w && w - bbr->prev_w > (bbr->prev_w >> BWRTT_TOL_B))||(w < bbr->prev_w  && bbr->prev_w - w > (bbr->prev_w >> BWRTT_TOL_B)))
 	{ //if change exceeds the tolerance decrease cycle length
-		u16 tmp = (bbr->cycle_len - 1);
+		u16 tmp = (bbr->cycle_len - CYCLE_LEN_INCR);
 		bbr->cycle_len = (tmp < MIN_CYCLE_LEN)? MIN_CYCLE_LEN : tmp;
 		//bbr->cycle_len = 31;
 	}
 	else
 	{
-		u16 tmp = (bbr->cycle_len + 1);
+		u16 tmp = (bbr->cycle_len + CYCLE_LEN_INCR);
 		bbr->cycle_len = (tmp >= MAX_CYCLE_LEN)? MAX_CYCLE_LEN : tmp;
 		//bbr->cycle_len = 31;
 	}

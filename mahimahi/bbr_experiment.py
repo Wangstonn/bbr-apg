@@ -39,7 +39,7 @@ class Flags(object):
     TDOWN = "trace_downlink"
     HEADLESS = "headless"
     OUTPUT_FILE = "output_file"
-    EXPERIMENT = "output_file"
+    EXPERIMENT = "experiment"
     parsed_args = None
 
 
