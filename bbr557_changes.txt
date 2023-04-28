@@ -1,0 +1,62 @@
+initialize to cycle length of 8, at cycle between 2 and 7
+
+
+
+struct bbr
+
+cycle_idx : 3->5
+bbr->cycle_len : 5 
+u64 bbr->prev_w
+-#define CYCLE_LEN
+#define MAX_CYCLE_LEN 32
+#define MIN_CYCLE_LEN = 4
+#define BWRTT_TOL = 2
+
+
+static const int bbr_bw_rtts = CYCLE_LEN + 2; -> 10+ 2;
+
+
+
+bbr_pacing_gain[] = {
+	BBR_UNIT * 5 / 4,	/* probe for more available bw */
+	BBR_UNIT * 3 / 4,	/* drain queue and/or yield bw to other flows */
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	/* cruise at 1.0*bw to utilize pipe, */
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,   /* without creating excess queue... */
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,
+	BBR_UNIT, BBR_UNIT, BBR_UNIT,	
+	BBR_UNIT, BBR_UNIT, BBR_UNIT
+
+
+bbr_target_cwnd
+if ((w > bbr->prev_w && w - bbr->prev_w > bbr->prev_w >> BWRTT_TOL)||(w < bbr->prev_w  && bbr->prev_w - w > bbr->prev_w >> BWRTT_TOL))
+{
+	u16 tmp = (bbr->cycle_len + 1);
+	bbr->cycle_len = (tmp > MAX_CYCLE_LEN) MAX_CYCLE_LEN : tmp	
+
+}
+else
+	u16 tmp = (bbr->cycle_len - 1);
+	bbr->cycle_len = (tmp < MIN_CYCLE_LEN) MIN_CYCLE_LEN : tmp
+
+
+bbr_advance_cycle_phase
+	bbr->cycle_idx = (bbr->cycle_idx + 1) & (bbr->cycle_len - 1); //Bitwise and->cycle idx between 0 and cycle_len
+
+
+bbr_cycle_rand = 7-> OK
+cycle_mstamp OK
+
+
+bbr_reset_probe_bw_mode
+	bbr->cycle_idx = bbr->cycle_len - 1 - prandom_u32_max(bbr_cycle_rand);
+
+
+
+bbr_init
+bbr->cycle_len = 8
+bbr->prev_w = 0

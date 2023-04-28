@@ -22,6 +22,6 @@ echo "Running Experiment 4: Verizon LTE Trace."
 for cc in $CONGESTION_CONTROL; do
   for loss_rate in $LOSS_RATES; do
     echo "Executing trial with cc=$cc Loss rate: $loss_rate ..."
-    ./bbr_experiment.py --cc=$cc --loss=$loss_rate --traceup traces/Verizon-LTE-short.up --tracedown traces/Verizon-LTE-short.down --output_file=$LOG_FILE $@
+    ./bbr_experiment.py --cc=$cc --loss=$loss_rate --traceup traces/Verizon-LTE-short.up --tracedown traces/Verizon-LTE-short.down --output_file=$LOG_FILE $@ --experiment experiment4 
   done
 done

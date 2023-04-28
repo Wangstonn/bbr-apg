@@ -39,6 +39,7 @@ class Flags(object):
     TDOWN = "trace_downlink"
     HEADLESS = "headless"
     OUTPUT_FILE = "output_file"
+    EXPERIMENT = "experiment"
     parsed_args = None
 
 
@@ -101,6 +102,9 @@ def _parse_args():
     parser.add_argument('--output_file', dest=Flags.OUTPUT_FILE, type=str,
                         help="If non empty, will append measurement result to this file.",
                         default="")
+    parser.add_argument('--experiment', dest=Flags.EXPERIMENT, type=str,
+                        help="Name of experiment.",
+                        default="")
     parser.add_argument('--rtt', dest=Flags.RTT, type=int,
                         help="Specify the RTT of the link in milliseconds.",
                         default=100)
@@ -126,11 +130,11 @@ def _parse_args():
     debug_print_verbose("Parse: " + str(Flags.parsed_args))
 
 
-def _parse_mahimahi_log(cc):
+def _parse_mahimahi_log(cc, experiment):
     # Piped to /dev/null because stdout is just the SVG generated.
     # We just want the throutput information, which is stderr.
     debug_print_verbose("Parsing Mahimahi logs...")
-    command_text = "mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_output.svg" % cc
+    command_text = "mm-throughput-graph 10 /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_%s_throughput.svg" %(cc,experiment)
     command = (command_text)
     output = subprocess.check_output(
         command, shell=True, stderr=subprocess.STDOUT)
@@ -140,6 +144,16 @@ def _parse_mahimahi_log(cc):
     goodput = float(output[1].split(' ')[2])
     q_delay = float(output[2].split(' ')[5])
     s_delay = float(output[3].split(' ')[4])
+
+    command_text = "mm-delay-graph /tmp/mahimahi_log > ~/557/mahimahi/temp/%s_%s_delay.svg" %(cc,experiment)
+    command = (command_text)
+    output = subprocess.check_output(
+        command, shell=True, stderr=subprocess.STDOUT)
+    output = output.split('\n')
+    debug_print_verbose(output)
+    pkt_q_delay = float(output[0].split(' ')[5])
+    sig_delay = float(output[1].split(' ')[4])
+
     return (capacity, goodput, q_delay, s_delay)
 
 
@@ -213,6 +227,7 @@ def main():
     bw = Flags.parsed_args[Flags.BW]
     cc = Flags.parsed_args[Flags.CC]
     output_file = Flags.parsed_args[Flags.OUTPUT_FILE]
+    experiment = Flags.parsed_args[Flags.EXPERIMENT] 
     uplink_trace = Flags.parsed_args[Flags.TUP]
     downlink_trace = Flags.parsed_args[Flags.TDOWN]
     # Generate the trace files based on the parameter
@@ -262,12 +277,12 @@ def main():
     server_q.close()
 
     e.clear()
-    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc)
+    (capacity, goodput, q_delay, s_delay) = _parse_mahimahi_log(cc,experiment)
     debug_print("Experiment complete!")
 
     # Print the output
     results = ', '.join([str(x)
-                         for x in [cc, loss, goodput, rtt, capacity, bw]])
+                         for x in [cc, loss, goodput, rtt, capacity, bw, q_delay, s_delay]])
     stdout_print(results + "\n")
 
     # Also write to output file if it's set.
@@ -278,7 +293,7 @@ def main():
                 output.write(results + "\n")
         else:
             with open(output_file, 'a') as output:
-                header_line = "congestion_control, loss_rate, goodput_Mbps, rtt_ms, bandwidth_Mbps, specified_bw_Mbps"
+                header_line = "congestion_control, loss_rate, goodput_Mbps, rtt_ms, bandwidth_Mbps, specified_bw_Mbps, pkt_q_delay, sig_delay"
                 output.write(header_line + "\n")
                 output.write(results + "\n")
 
