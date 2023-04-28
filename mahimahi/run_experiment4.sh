@@ -10,7 +10,7 @@ mkdir -p data
 #LOSS_RATES="0.001 0.01 0.1 1 2 5 10 15 20 25 30 40 50"
 LOSS_RATES="0.1"
 #CONGESTION_CONTROL="cubic bbr"
-CONGESTION_CONTROL="bbr557 bbr"
+CONGESTION_CONTROL="cubic bbr557 bbr"
 #CONGESTION_CONTROL="gargbage"
 LOG_FILE=data/experiment4.csv
 

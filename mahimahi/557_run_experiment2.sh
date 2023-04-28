@@ -11,7 +11,7 @@ mkdir -p data
 LOSS_RATES="0.1"
 #BW_MBPS="12"
 #CONGESTION_CONTROL="cubic bbr"
-CONGESTION_CONTROL="bbr557 bbr"
+CONGESTION_CONTROL="cubic bbr557 bbr"
 #CONGESTION_CONTROL="gargbage"
 LOG_FILE=data/experiment2.csv
 
