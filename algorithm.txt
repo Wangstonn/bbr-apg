@@ -3,6 +3,11 @@ stride = 4
 MIN_CYCLE_LEN = 4
 MAX_CYCLE_LEN = 16
 
+
+
+
+We initialize cycle length to 8 to match bbr-
+
 if (abs(current_BDP - prev_BDP) > prev_BDP * tol)
 	cycle_len ? (cycle_len - stride < MIN_CYCLE_LEN) MIN_CYCLE_LEN : cycle_len - stride
 else 
