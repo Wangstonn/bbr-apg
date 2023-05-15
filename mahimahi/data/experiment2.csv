@@ -1,3 +1,4 @@
 congestion_control, loss_rate, goodput_Mbps, rtt_ms, bandwidth_Mbps, specified_bw_Mbps, pkt_q_delay, sig_delay
-bbr557, 0.001, 15.59, 100, 18.05, 100, 199.0, 200.0
-bbr, 0.001, 16.87, 100, 18.05, 100, 200.0, 200.0
+cubic, 0.001, 8.65, 100, 18.05, 100, 107.0, 101.0
+bbr557, 0.001, 16.25, 100, 18.05, 100, 202.0, 202.0
+bbr, 0.001, 16.92, 100, 18.05, 100, 200.0, 201.0
