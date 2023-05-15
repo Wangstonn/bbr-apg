@@ -1,5 +1,7 @@
 # BBR-APG: Making TCP-BBR more adaptive
 This project for EECS 557 Communication Networks as University of Michigan.
+It was built upon [this](https://reproducingnetworkresearch.wordpress.com/2017/06/05/rebbr/) replication project by Luke Hsiao and Jervis Muindi at Stanford.
+Our novel contributions are located in the report document
 
 ## Getting started
 - set up google cloud VM using ubuntu (pro) 16.04 
