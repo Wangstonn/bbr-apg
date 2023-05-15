@@ -1,5 +1,5 @@
-# ReBBR: Reproducing BBR Performance on Lossy Networks
-
+# BBR-APG: Making TCP-BBR more adaptive
+This project for EECS 557 Communication Networks as University of Michigan.
 
 ## Getting started
 - set up google cloud VM using ubuntu (pro) 16.04 
